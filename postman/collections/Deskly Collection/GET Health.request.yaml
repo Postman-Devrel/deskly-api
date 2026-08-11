@@ -1,0 +1,8 @@
+$kind: http-request
+name: GET Health
+description: Liveness probe. Public endpoint (no auth required), but X-API-Key is included for consistency.
+url: http://localhost:4000/health
+method: GET
+headers:
+  X-API-Key: demo-key
+order: 1786446634517

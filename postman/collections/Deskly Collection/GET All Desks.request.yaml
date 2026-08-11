@@ -1,0 +1,8 @@
+$kind: http-request
+name: GET All Desks
+description: ""
+url: http://localhost:4000/desks
+method: GET
+headers:
+  X-API-Key: demo-key
+order: 1786446634516
