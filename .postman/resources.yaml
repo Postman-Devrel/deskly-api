@@ -1,0 +1,8 @@
+workspace:
+  id: f5365212-8657-4de7-a989-aeb992f344dc
+localResources:
+  specs:
+    - ../postman/specs/Deskly API/Deskly API.yaml
+resourceNameMappings:
+  specs:
+    - ../postman/specs/Deskly API/Deskly API.yaml: Deskly API

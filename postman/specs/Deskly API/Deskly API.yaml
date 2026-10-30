@@ -1,0 +1,357 @@
+openapi: 3.0.0
+info:
+  title: Deskly API
+  version: 1.0.0
+  description: Hot-desk booking service for a hybrid office. Endpoints for managing desks and bookings.
+servers:
+  - url: 'http://localhost:4000'
+paths:
+  /health:
+    get:
+      summary: Health Check
+      description: Returns the health status of the API.
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+              example:
+                status: ok
+  /desks:
+    get:
+      summary: List Desks
+      parameters:
+        - name: zone
+          in: query
+          description: 'Filter by zone: north | south | quiet'
+          schema:
+            type: string
+          example: north
+        - name: X-API-Key
+          in: header
+          schema:
+            type: string
+          example: demo-key
+      responses:
+        '200':
+          description: A list of desks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    zone:
+                      type: string
+                    available:
+                      type: boolean
+              example:
+                - id: desk-1
+                  zone: north
+                  available: true
+                - id: desk-2
+                  zone: south
+                  available: false
+        '401':
+          description: Unauthorized - missing or invalid API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: Unauthorized
+  '/desks/{deskId}':
+    parameters:
+      - name: deskId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: desk-1
+    get:
+      summary: Get Desk
+      parameters:
+        - name: X-API-Key
+          in: header
+          schema:
+            type: string
+          example: demo-key
+      responses:
+        '200':
+          description: A single desk object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  zone:
+                    type: string
+                  available:
+                    type: boolean
+              example:
+                id: desk-1
+                zone: north
+                available: true
+        '401':
+          description: Unauthorized - missing or invalid API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: Unauthorized
+        '404':
+          description: Desk not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: Desk not found
+  /bookings:
+    get:
+      summary: List Bookings
+      parameters:
+        - name: date
+          in: query
+          description: Filter by date YYYY-MM-DD
+          schema:
+            type: string
+          example: '2026-08-06'
+        - name: deskId
+          in: query
+          description: Filter by desk ID
+          schema:
+            type: string
+          example: desk-1
+        - name: X-API-Key
+          in: header
+          schema:
+            type: string
+          example: demo-key
+      responses:
+        '200':
+          description: A list of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    deskId:
+                      type: string
+                    date:
+                      type: string
+                      format: date
+                    bookedBy:
+                      type: string
+                      format: email
+              example:
+                - id: bkg_seed01
+                  deskId: desk-1
+                  date: '2026-08-06'
+                  bookedBy: toba@example.com
+        '401':
+          description: Unauthorized - missing or invalid API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: Unauthorized
+    post:
+      summary: Create Booking
+      parameters:
+        - name: X-API-Key
+          in: header
+          schema:
+            type: string
+          example: demo-key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deskId
+                - date
+                - bookedBy
+              properties:
+                deskId:
+                  type: string
+                date:
+                  type: string
+                  format: date
+                bookedBy:
+                  type: string
+                  format: email
+            example:
+              deskId: desk-3
+              date: '2026-11-10'
+              bookedBy: toba@example.com
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  deskId:
+                    type: string
+                  date:
+                    type: string
+                    format: date
+                  bookedBy:
+                    type: string
+                    format: email
+              example:
+                id: bkg_seed02
+                deskId: desk-3
+                date: '2026-11-10'
+                bookedBy: toba@example.com
+        '400':
+          description: Bad request - invalid or missing fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: Missing required field deskId
+        '401':
+          description: Unauthorized - missing or invalid API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: Unauthorized
+  '/bookings/{bookingId}':
+    parameters:
+      - name: bookingId
+        in: path
+        required: true
+        schema:
+          type: string
+        example: bkg_seed01
+    get:
+      summary: Get Booking
+      parameters:
+        - name: X-API-Key
+          in: header
+          schema:
+            type: string
+          example: demo-key
+      responses:
+        '200':
+          description: A single booking object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  deskId:
+                    type: string
+                  date:
+                    type: string
+                    format: date
+                  bookedBy:
+                    type: string
+                    format: email
+              example:
+                id: bkg_seed01
+                deskId: desk-1
+                date: '2026-08-06'
+                bookedBy: toba@example.com
+        '401':
+          description: Unauthorized - missing or invalid API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: Unauthorized
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: Booking not found
+    delete:
+      summary: Delete Booking
+      parameters:
+        - name: X-API-Key
+          in: header
+          schema:
+            type: string
+          example: demo-key
+      responses:
+        '204':
+          description: Booking deleted successfully
+        '401':
+          description: Unauthorized - missing or invalid API key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: Unauthorized
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              example:
+                error: Booking not found
